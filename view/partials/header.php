@@ -42,7 +42,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Invitado';
                 <?php endif; ?>
 
                 <?php if ($rolUsuario === 'Administrador' || $rolUsuario === 'Supervisor' || $rolUsuario === 'CEO') : ?>
-                    <a href="#" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Reportes</a>
+                    <a href="reportes.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Reportes</a>
                 <?php endif; ?>
 
                 <?php if ($rolUsuario === 'Administrador') : ?>
