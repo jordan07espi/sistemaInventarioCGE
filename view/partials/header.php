@@ -22,7 +22,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Invitado';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 flex flex-col min-h-screen">
 
     <!-- Header / Navbar -->
     <header class="bg-gray-800 text-white shadow-lg">
@@ -37,7 +37,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Invitado';
             <nav class="hidden md:flex space-x-4">
                 <a href="dashboard.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Dashboard</a>
                 <a href="productos.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Productos</a>
-                <a href="#" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Espacios</a>
+                <a href="espacios.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Espacios</a>
                 <a href="#" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Reportes</a>
                 <?php if ($rolUsuario === 'Administrador') : ?>
                     <a href="#" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Usuarios</a>
