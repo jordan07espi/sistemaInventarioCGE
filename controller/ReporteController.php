@@ -2,6 +2,7 @@
 // Archivo: controller/ReporteController.php
 session_start();
 require_once '../model/ReporteDAO.php';
+require_once '../lib/fpdf/fpdf.php';
 
 // --- LÓGICA COMPLETA Y MEJORADA PARA EXPORTACIÓN ---
 $exportAction = $_GET['action'] ?? '';
@@ -41,7 +42,7 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
         header('Content-Disposition: attachment; filename=Reporte_Consumo_' . $periodoFile . '.csv');
         $output = fopen('php://output', 'w');
         
-        fputcsv($output, ['Reporte de Consumo - ' . $periodoStr]);
+        fputcsv($output, ['JoseSoft - Reporte de Consumo - ' . $periodoStr]);
         fputcsv($output, []); 
         fputcsv($output, ['Consumo General por Implemento']);
         fputcsv($output, ['Producto', 'Unidad', 'Total Consumido']);
@@ -60,9 +61,8 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
         exit();
     }
     
-    // --- LÓGICA PARA PDF (FPDF) CON ICONV ---
+    // --- LÓGICA PARA PDF (FPDF) ---
     if ($exportAction === 'exportarPdf') {
-        require_once '../lib/fpdf/fpdf.php';
 
         class PDF extends FPDF {
             private $periodo;
@@ -73,15 +73,40 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
 
             function Header() {
                 $this->SetFont('Arial','B',14);
-                $this->Cell(0,10, iconv('UTF-8', 'windows-1252', 'Reporte de Consumo'), 0, 1, 'C');
+                $this->Cell(0,10, iconv('UTF-8', 'windows-1252', 'JoseSoft - Reporte de Consumo'), 0, 1, 'C');
                 $this->SetFont('Arial','',10);
                 $this->Cell(0, 7, iconv('UTF-8', 'windows-1252', 'Período: ') . $this->periodo, 0, 1, 'C');
                 $this->Ln(5);
             }
+
+            // --- FOOTER CORREGIDO Y FINAL ---
             function Footer() {
                 $this->SetY(-15);
-                $this->SetFont('Arial','I',8);
-                $this->Cell(0,10, 'Pagina ' . $this->PageNo(), 0, 0, 'C');
+                $this->SetFont('Arial','',8);
+                
+                // 1. Definir los textos
+                $texto1 = iconv('UTF-8', 'windows-1252', 'Sistema de Inventario Desarrollado por ');
+                $texto_bold = 'CelestiumSoft';
+                $texto2 = iconv('UTF-8', 'windows-1252', ' | CGE. Todos los derechos reservados.');
+
+                // 2. Calcular el ancho total del texto
+                $ancho_texto1 = $this->GetStringWidth($texto1);
+                $this->SetFont('Arial','B',8);
+                $ancho_bold = $this->GetStringWidth($texto_bold);
+                $this->SetFont('Arial','',8);
+                $ancho_texto2 = $this->GetStringWidth($texto2);
+                $ancho_total = $ancho_texto1 + $ancho_bold + $ancho_texto2;
+
+                // 3. Calcular la posición inicial para centrar
+                $posicion_inicial = ($this->GetPageWidth() - $ancho_total) / 2;
+                $this->SetX($posicion_inicial);
+
+                // 4. Escribir el texto en secuencia
+                $this->Cell($ancho_texto1, 10, $texto1, 0, 0, 'L');
+                $this->SetFont('Arial','B',8);
+                $this->Cell($ancho_bold, 10, $texto_bold, 0, 0, 'L');
+                $this->SetFont('Arial','',8);
+                $this->Cell($ancho_texto2, 10, $texto2, 0, 0, 'L');
             }
         }
 
@@ -89,7 +114,6 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
         $pdf->setPeriodo($periodoStr);
         $pdf->AddPage();
         
-        // Tabla de Consumo General
         $pdf->SetFont('Arial','B',12);
         $pdf->Cell(0, 10, iconv('UTF-8', 'windows-1252', 'Consumo General por Implemento'), 0, 1);
         $pdf->SetFont('Arial','B',10);
@@ -105,7 +129,6 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
 
         $pdf->Ln(10);
 
-        // Tabla de Consumo Detallado
         $pdf->SetFont('Arial','B',12);
         $pdf->Cell(0, 10, iconv('UTF-8', 'windows-1252', 'Consumo Detallado por Espacio y Jornada'), 0, 1);
         $pdf->SetFont('Arial','B',10);
