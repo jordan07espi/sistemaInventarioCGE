@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('action', 'generarReporte');
         formData.append('rango', rango);
 
-        // Opcional: Mostrar un loader
         reporteGeneralBody.innerHTML = '<p class="text-gray-500">Generando reporte...</p>';
         reporteDetalladoBody.innerHTML = '<p class="text-gray-500">Generando reporte...</p>';
         zonaResultados.classList.remove('hidden');
@@ -35,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 periodoGeneral.textContent = `Periodo: ${data.data.periodo}`;
                 periodoDetallado.textContent = `Periodo: ${data.data.periodo}`;
 
-                // Actualizar links de exportación
                 const baseUrl = `../../controller/ReporteController.php?rango=${rango}`;
                 btnPdf.href = `${baseUrl}&action=exportarPdf`;
                 btnExcel.href = `${baseUrl}&action=exportarExcel`;
@@ -55,10 +53,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let html = '<ul class="space-y-2">';
         datos.forEach(item => {
+            // Sanitizar
+            const nombreProducto = sanitizeHTML(item.nombre_producto);
+            const unidadMedida = sanitizeHTML(item.unidad_medida);
+            const totalConsumido = sanitizeHTML(item.total_consumido);
+
             html += `
                 <li class="flex justify-between items-center border-b pb-1">
-                    <span>${item.nombre_producto} (${item.unidad_medida})</span>
-                    <span class="font-bold text-lg">${parseFloat(item.total_consumido)}</span>
+                    <span>${nombreProducto} (${unidadMedida})</span>
+                    <span class="font-bold text-lg">${parseFloat(totalConsumido)}</span>
                 </li>
             `;
         });
@@ -76,10 +79,18 @@ document.addEventListener('DOMContentLoaded', function() {
         let html = '';
         let espacioActual = '';
         datos.forEach(item => {
-            const nombreCompletoEspacio = `${item.nombre_espacio} - ${item.piso}`;
+            // Sanitizar
+            const nombreEspacio = sanitizeHTML(item.nombre_espacio);
+            const piso = sanitizeHTML(item.piso);
+            const nombreProducto = sanitizeHTML(item.nombre_producto);
+            const unidadMedida = sanitizeHTML(item.unidad_medida);
+            const jornada = sanitizeHTML(item.jornada ? item.jornada : 'No especificada');
+            const totalConsumido = sanitizeHTML(item.total_consumido);
+
+            const nombreCompletoEspacio = `${nombreEspacio} - ${piso}`;
             if (nombreCompletoEspacio !== espacioActual) {
                 if (espacioActual !== '') {
-                    html += '</ul></div>'; // Cierra el div y ul anterior
+                    html += '</ul></div>';
                 }
                 espacioActual = nombreCompletoEspacio;
                 html += `
@@ -89,17 +100,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             }
 
-            // Si la jornada existe, la mostramos. Si es nula o vacía, mostramos 'No especificada'.
-            const jornadaTexto = item.jornada ? item.jornada : 'No especificada';
-
             html += `
                 <li class="flex justify-between items-center text-sm">
-                    <span>${item.nombre_producto} (${item.unidad_medida}) - <em class="text-gray-500">${jornadaTexto}</em></span>
-                    <span class="font-semibold">${parseFloat(item.total_consumido)}</span>
+                    <span>${nombreProducto} (${unidadMedida}) - <em class="text-gray-500">${jornada}</em></span>
+                    <span class="font-semibold">${parseFloat(totalConsumido)}</span>
                 </li>
             `;
         });
-        html += '</ul></div>'; // Cierra el último div
+        html += '</ul></div>';
         reporteDetalladoBody.innerHTML = html;
     }
 });

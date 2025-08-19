@@ -1,10 +1,5 @@
 // Archivo: view/assets/js/dashboard.js
 
-/**
- * Esta función ahora se define directamente en el objeto 'window', 
- * asegurando que esté disponible globalmente tan pronto como el navegador
- * cargue este archivo. Esto resuelve la condición de carrera.
- */
 window.actualizarDashboard = function(data) {
     // Actualizar tarjetas de resumen
     document.getElementById('total-productos').textContent = data.resumen.total_productos;
@@ -18,13 +13,18 @@ window.actualizarDashboard = function(data) {
     
     if (data.inventarioActual && data.inventarioActual.length > 0) {
         data.inventarioActual.forEach(p => {
-            // Se añade una clase de color rojo si el stock es bajo para mayor visibilidad
             const stockClass = parseFloat(p.stock_actual) <= parseFloat(p.stock_minimo) ? 'text-red-500 font-bold' : '';
+            
+            // Sanitizar datos antes de insertarlos en el HTML
+            const nombreProducto = sanitizeHTML(p.nombre_producto);
+            const stockActual = sanitizeHTML(p.stock_actual);
+            const unidadMedida = sanitizeHTML(p.unidad_medida);
+
             inventarioBody.innerHTML += `
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="py-2 px-4">${p.nombre_producto}</td>
-                    <td class="py-2 px-4 text-right ${stockClass}">${p.stock_actual}</td>
-                    <td class="py-2 px-4">${p.unidad_medida}</td>
+                    <td class="py-2 px-4">${nombreProducto}</td>
+                    <td class="py-2 px-4 text-right ${stockClass}">${stockActual}</td>
+                    <td class="py-2 px-4">${unidadMedida}</td>
                 </tr>
             `;
         });
@@ -40,16 +40,22 @@ window.actualizarDashboard = function(data) {
             let descripcion = '';
             let color = m.tipo_movimiento === 'Entrada' ? 'text-green-600' : 'text-red-600';
             
+            // Sanitizar datos dinámicos
+            const cantidad = sanitizeHTML(m.cantidad);
+            const unidadMedida = sanitizeHTML(m.unidad_medida);
+            const nombreProducto = sanitizeHTML(m.nombre_producto);
+            const nombreUsuario = sanitizeHTML(m.nombre_usuario);
+
             if (m.tipo_movimiento === 'Salida') {
-                descripcion = `<strong class="${color}">SALIDA</strong> de <strong>${m.cantidad} ${m.unidad_medida}</strong> de <strong>${m.nombre_producto}</strong>.`;
+                descripcion = `<strong class="${color}">SALIDA</strong> de <strong>${cantidad} ${unidadMedida}</strong> de <strong>${nombreProducto}</strong>.`;
             } else {
-                descripcion = `<strong class="${color}">ENTRADA</strong> de <strong>${m.cantidad} ${m.unidad_medida}</strong> de <strong>${m.nombre_producto}</strong>.`;
+                descripcion = `<strong class="${color}">ENTRADA</strong> de <strong>${cantidad} ${unidadMedida}</strong> de <strong>${nombreProducto}</strong>.`;
             }
 
             actividadBody.innerHTML += `
                 <tr class="border-b hover:bg-gray-50">
                     <td class="py-2 px-4">${descripcion}</td>
-                    <td class="py-2 px-4 text-gray-700">${m.nombre_usuario}</td>
+                    <td class="py-2 px-4 text-gray-700">${nombreUsuario}</td>
                 </tr>
             `;
         });
@@ -58,8 +64,6 @@ window.actualizarDashboard = function(data) {
     }
 };
 
-// El listener DOMContentLoaded ya no es necesario aquí para definir la función,
-// pero lo mantenemos por si quieres añadir lógica futura que sí dependa del DOM.
 document.addEventListener('DOMContentLoaded', function() {
-    // Puedes poner aquí código que se ejecute solo cuando el HTML del dashboard esté listo.
+    // Código futuro que dependa del DOM puede ir aquí.
 });

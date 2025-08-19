@@ -43,12 +43,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 tbody.innerHTML = '';
                 if (data.success) {
                     data.data.forEach(p => {
+                        // Sanitizar datos antes de insertarlos
+                        const nombreProducto = sanitizeHTML(p.nombre_producto);
+                        const unidadMedida = sanitizeHTML(p.unidad_medida);
+                        const stockActual = sanitizeHTML(p.stock_actual);
+                        const stockMinimo = sanitizeHTML(p.stock_minimo);
+
                         tbody.innerHTML += `
                             <tr class="border-b hover:bg-gray-50">
-                                <td class="py-2 px-4">${p.nombre_producto}</td>
-                                <td class="py-2 px-4">${p.unidad_medida}</td>
-                                <td class="py-2 px-4">${p.stock_actual}</td>
-                                <td class="py-2 px-4">${p.stock_minimo}</td>
+                                <td class="py-2 px-4">${nombreProducto}</td>
+                                <td class="py-2 px-4">${unidadMedida}</td>
+                                <td class="py-2 px-4">${stockActual}</td>
+                                <td class="py-2 px-4">${stockMinimo}</td>
                                 <td class="py-2 px-4">
                                     <button class="btn-editar bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600" data-id="${p.id_producto}">Editar</button>
                                     <button class="btn-eliminar bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" data-id="${p.id_producto}">Eliminar</button>

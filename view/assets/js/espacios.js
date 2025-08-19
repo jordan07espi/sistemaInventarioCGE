@@ -39,11 +39,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 tbody.innerHTML = '';
                 if (data.success) {
                     data.data.forEach(e => {
+                        // Sanitizar datos antes de insertarlos
+                        const nombreEspacio = sanitizeHTML(e.nombre_espacio);
+                        const piso = sanitizeHTML(e.piso);
+                        const descripcion = sanitizeHTML(e.descripcion);
+
                         tbody.innerHTML += `
                             <tr class="border-b hover:bg-gray-50">
-                                <td class="py-2 px-4">${e.nombre_espacio}</td>
-                                <td class="py-2 px-4">${e.piso}</td>
-                                <td class="py-2 px-4">${e.descripcion}</td>
+                                <td class="py-2 px-4">${nombreEspacio}</td>
+                                <td class="py-2 px-4">${piso}</td>
+                                <td class="py-2 px-4">${descripcion}</td>
                                 <td class="py-2 px-4">
                                     <button class="btn-editar bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600" data-id="${e.id_espacio}">Editar</button>
                                     <button class="btn-eliminar bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" data-id="${e.id_espacio}">Eliminar</button>

@@ -1,4 +1,18 @@
-// Archivo: view/assets/js/main.js
+/**
+ * Sanitiza una cadena de texto para prevenir ataques XSS al usar innerHTML.
+ * Reemplaza los caracteres HTML peligrosos con sus equivalentes seguros.
+ * @param {string | number | null} str La cadena a sanitizar.
+ * @returns {string} La cadena sanitizada.
+ */
+function sanitizeHTML(str) {
+    if (str === null || typeof str === 'undefined') {
+        return '';
+    }
+    const temp = document.createElement('div');
+    temp.textContent = str.toString();
+    return temp.innerHTML;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     
     function cargarDatosGlobales() {
@@ -18,10 +32,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         listaAlertas.innerHTML = '';
                         data.productosBajoStock.forEach(p => {
+                            // Aplicamos sanitización a los datos antes de insertarlos
+                            const nombreProducto = sanitizeHTML(p.nombre_producto);
+                            const stockActual = sanitizeHTML(p.stock_actual);
+                            const stockMinimo = sanitizeHTML(p.stock_minimo);
+
                             listaAlertas.innerHTML += `
                                 <li class="p-2 border-b text-sm text-gray-700 hover:bg-gray-100">
-                                    <strong>${p.nombre_producto}</strong> solo tiene 
-                                    <span class="font-bold text-red-600">${p.stock_actual}</span>/${p.stock_minimo} unidades.
+                                    <strong>${nombreProducto}</strong> solo tiene 
+                                    <span class="font-bold text-red-600">${stockActual}</span>/${stockMinimo} unidades.
                                 </li>
                             `;
                         });

@@ -1,17 +1,48 @@
 <?php
 // Archivo: view/partials/header.php
+
+// 1. INICIO DE SESIÓN SEGURO
+// Asegura que la sesión siempre se inicie.
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// 2. CONTROL DE CACHÉ DEL NAVEGADOR
+// Estas cabeceras le dicen al navegador que no guarde la página en caché.
+// Esto soluciona el problema de poder ver páginas privadas con el botón "Atrás" después de cerrar sesión.
+header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
+header('Pragma: no-cache'); // HTTP 1.0.
+header('Expires: 0'); // Proxies.
+
+// 3. VERIFICACIÓN DE SESIÓN Y TIEMPO DE INACTIVIDAD
+$tiempo_limite_inactividad = 30 * 60; // 30 minutos
+
+// Primero, verificamos si el usuario está logueado.
 if (!isset($_SESSION['id_usuario'])) {
-    header('Location: ../../login.php');
+    // Si no hay sesión, lo redirigimos al login.
+    header('Location: ../../login.php?error=no_session');
     exit();
 }
 
+// Si está logueado, verificamos su actividad.
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $tiempo_limite_inactividad)) {
+    // Si ha pasado demasiado tiempo inactivo, destruimos la sesión.
+    session_unset();
+    session_destroy();
+    header('Location: ../../login.php?error=inactive'); // Redirigir con un mensaje
+    exit();
+}
+
+// Si sigue activo, actualizamos la marca de tiempo de su última actividad.
+$_SESSION['last_activity'] = time();
+
+// El resto de tu código para obtener variables de sesión...
 $nombreUsuario = $_SESSION['nombre_completo'] ?? 'Usuario';
 $rolUsuario = $_SESSION['rol'] ?? 'Invitado';
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>

@@ -18,7 +18,21 @@ if (isset($_SESSION['id_usuario'])) {
         <div class="flex justify-center mb-6">
             <img src="view/assets/img/logo.png" alt="Logo" class="h-16" onerror="this.style.display='none'">
         </div>
-        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Control de Inventario</h2>
+        <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">JoseSoft</h2>
+
+        <?php
+        if (isset($_GET['error'])) {
+            $mensaje = '';
+            if ($_GET['error'] === 'inactive') {
+                $mensaje = 'Tu sesión ha expirado por inactividad.';
+            } elseif ($_GET['error'] === 'no_session') {
+                $mensaje = 'Debes iniciar sesión para acceder.';
+            }
+            if ($mensaje) {
+                echo '<div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert"><p>' . $mensaje . '</p></div>';
+            }
+        }
+        ?>
         
         <form id="loginForm" method="POST">
             <div class="mb-4">

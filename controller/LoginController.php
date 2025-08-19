@@ -35,6 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['nombre_completo'] = $usuario->nombre_completo;
         $_SESSION['cedula'] = $usuario->cedula;
         $_SESSION['rol'] = $usuario->nombre_rol;
+        $_SESSION['last_activity'] = time();
         
         $response['success'] = true;
         $response['message'] = 'Inicio de sesión exitoso.';

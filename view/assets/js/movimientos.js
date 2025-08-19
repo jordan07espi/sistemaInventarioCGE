@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fechaFin = document.getElementById('fecha_fin').value;
         const formData = new FormData();
         formData.append('action', 'listarRecientes');
-        formData.append('pagina', pagina); // Enviamos la página que queremos cargar
+        formData.append('pagina', pagina);
 
         if (fechaInicio && fechaFin) {
             formData.append('fecha_inicio', fechaInicio);
@@ -31,20 +31,29 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 tablaBody.innerHTML = '';
                 if (data.success && data.data.length > 0) {
-                    // (El código para renderizar las filas de la tabla no cambia)
                     data.data.forEach(m => {
                         let descripcion = '';
                         let color = m.tipo_movimiento === 'Entrada' ? 'text-green-600' : 'text-red-600';
+
+                        // Sanitizar todos los datos antes de construir el HTML
+                        const cantidad = sanitizeHTML(m.cantidad);
+                        const unidadMedida = sanitizeHTML(m.unidad_medida);
+                        const nombreProducto = sanitizeHTML(m.nombre_producto);
+                        const nombreEspacio = sanitizeHTML(m.nombre_espacio || 'N/A');
+                        const jornada = sanitizeHTML(m.jornada || 'N/A');
+                        const descripcionOriginal = sanitizeHTML(m.descripcion_original);
+                        const nombreUsuario = sanitizeHTML(m.nombre_usuario);
+
                         if (m.tipo_movimiento === 'Salida') {
-                            descripcion = `<strong class="${color}">SALIDA</strong> de <strong>${m.cantidad} ${m.unidad_medida}</strong> de <strong>${m.nombre_producto}</strong> a <strong>${m.nombre_espacio || 'N/A'}</strong> en jornada <strong>${m.jornada || 'N/A'}</strong>.`;
+                            descripcion = `<strong class="${color}">SALIDA</strong> de <strong>${cantidad} ${unidadMedida}</strong> de <strong>${nombreProducto}</strong> a <strong>${nombreEspacio}</strong> en jornada <strong>${jornada}</strong>.`;
                         } else {
-                            descripcion = `<strong class="${color}">ENTRADA</strong> de <strong>${m.cantidad} ${m.unidad_medida}</strong> de <strong>${m.nombre_producto}</strong> al inventario general.`;
+                            descripcion = `<strong class="${color}">ENTRADA</strong> de <strong>${cantidad} ${unidadMedida}</strong> de <strong>${nombreProducto}</strong> al inventario general.`;
                         }
                         if (m.es_correccion == 1) {
                             descripcion += ` <span class="text-yellow-600 font-bold">(CORRECCIÓN)</span>`;
                         }
-                        if (m.descripcion_original) {
-                             descripcion += ` <span class="text-gray-500 italic"> - "${m.descripcion_original}"</span>`;
+                        if (descripcionOriginal) {
+                             descripcion += ` <span class="text-gray-500 italic"> - "${descripcionOriginal}"</span>`;
                         }
                         const fecha = new Date(m.fecha_movimiento);
                         const fechaFormateada = fecha.toLocaleDateString('es-EC', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' + fecha.toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit' });
@@ -54,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         tablaBody.innerHTML += `
                             <tr class="border-b hover:bg-gray-50">
                                 <td class="py-3 px-4">${descripcion}</td>
-                                <td class="py-3 px-4">${m.nombre_usuario}</td>
+                                <td class="py-3 px-4">${nombreUsuario}</td>
                                 <td class="py-3 px-4">${fechaFormateada}</td>
                                 <td class="py-3 px-4">${accionesHtml}</td>
                             </tr>`;
@@ -62,7 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     tablaBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No hay movimientos para mostrar.</td></tr>';
                 }
-                // Llamamos a la función para renderizar los botones de paginación
                 renderizarPaginacion(data.pagination);
             });
     }
