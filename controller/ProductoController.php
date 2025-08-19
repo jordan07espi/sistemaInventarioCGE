@@ -1,6 +1,7 @@
 <?php
 // Archivo: controller/ProductoController.php
 require_once '../model/ProductoDAO.php';
+require_once '../model/dto/Producto.php';
 
 header('Content-Type: application/json');
 $response = ['success' => false, 'message' => 'Acción no reconocida.'];

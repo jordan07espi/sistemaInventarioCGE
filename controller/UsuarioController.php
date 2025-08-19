@@ -1,6 +1,7 @@
 <?php
 // Archivo: controller/UsuarioController.php
 require_once '../model/UsuarioDAO.php';
+require_once '../model/dto/Usuario.php';
 
 header('Content-Type: application/json');
 $response = ['success' => false, 'message' => 'Acción no reconocida.'];

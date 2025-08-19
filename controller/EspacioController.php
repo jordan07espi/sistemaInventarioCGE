@@ -1,6 +1,7 @@
 <?php
 // Archivo: controller/EspacioController.php
 require_once '../model/EspacioDAO.php';
+require_once '../model/dto/Espacio.php';
 
 header('Content-Type: application/json');
 $response = ['success' => false, 'message' => 'Acción no reconocida.'];

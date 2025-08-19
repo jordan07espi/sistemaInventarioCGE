@@ -37,6 +37,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Invitado';
             <nav class="hidden md:flex space-x-4">
                 <?php if ($rolUsuario === 'Administrador' || $rolUsuario === 'Supervisor') : ?>
                     <a href="dashboard.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Dashboard</a>
+                    <a href="movimientos.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Movimientos</a>
                     <a href="productos.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Productos</a>
                     <a href="espacios.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Espacios</a>
                 <?php endif; ?>
