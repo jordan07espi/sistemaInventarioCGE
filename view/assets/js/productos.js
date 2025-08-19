@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
     btnNuevo.addEventListener('click', () => abrirModal('Nuevo Producto', 'agregar'));
     closeModalBtn.addEventListener('click', cerrarModal);
     
-    // Cargar tabla de productos
     function cargarProductos() {
         fetch('../../controller/ProductoController.php?action=listar')
             .then(res => res.json())
@@ -45,14 +44,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     data.data.forEach(p => {
                         tbody.innerHTML += `
-                            <tr class="border-b">
+                            <tr class="border-b hover:bg-gray-50">
                                 <td class="py-2 px-4">${p.nombre_producto}</td>
                                 <td class="py-2 px-4">${p.unidad_medida}</td>
                                 <td class="py-2 px-4">${p.stock_actual}</td>
                                 <td class="py-2 px-4">${p.stock_minimo}</td>
                                 <td class="py-2 px-4">
-                                    <button class="btn-editar bg-yellow-500 text-white px-3 py-1 rounded" data-id="${p.id_producto}">Editar</button>
-                                    <button class="btn-eliminar bg-red-500 text-white px-3 py-1 rounded" data-id="${p.id_producto}">Eliminar</button>
+                                    <button class="btn-editar bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600" data-id="${p.id_producto}">Editar</button>
+                                    <button class="btn-eliminar bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" data-id="${p.id_producto}">Eliminar</button>
                                 </td>
                             </tr>
                         `;
@@ -61,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // Evento para guardar (agregar/actualizar)
     productoForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const formData = new FormData(productoForm);
@@ -74,15 +72,13 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 cerrarModal();
-                cargarProductos(); // Recargar la tabla
-                // Aquí podrías mostrar una notificación de éxito
+                cargarProductos();
             } else {
-                alert(data.message); // O mostrar el error
+                alert(data.message);
             }
         });
     });
 
-    // Delegación de eventos para botones editar y eliminar
     document.getElementById('tablaProductosBody').addEventListener('click', function(e) {
         const id = e.target.dataset.id;
         if (e.target.classList.contains('btn-editar')) {
@@ -99,8 +95,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         }
 
+        // ===== SECCIÓN DE ELIMINAR (AHORA ACTIVA) =====
         if (e.target.classList.contains('btn-eliminar')) {
-            if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+            // Usamos un popup de confirmación nativo del navegador
+            if (confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.')) {
                 const formData = new FormData();
                 formData.append('action', 'eliminar');
                 formData.append('id_producto', id);
@@ -109,15 +107,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            cargarProductos();
+                            cargarProductos(); 
                         } else {
-                            alert(data.message);
+                            alert(data.message); 
                         }
                     });
             }
         }
     });
 
-    // Carga inicial
     cargarProductos();
 });
