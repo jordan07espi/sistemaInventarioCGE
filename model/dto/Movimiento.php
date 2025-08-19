@@ -10,5 +10,6 @@ class Movimiento {
     public $jornada; 
     public $fecha_movimiento;
     public $descripcion;
+    public $es_correccion = 0;
 }
 ?>

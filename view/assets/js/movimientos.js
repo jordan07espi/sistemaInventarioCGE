@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalTitle = document.getElementById('modalTitle');
     const camposSalida = document.getElementById('camposSalida');
     const btnFiltrar = document.getElementById('btnFiltrar');
+    // CORRECCIÓN 1: Definir tablaBody aquí para que sea accesible globalmente en el script.
+    const tablaBody = document.getElementById('tablaMovimientosBody'); 
 
     // --- Funciones ---
 
@@ -26,8 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('../../controller/MovimientoController.php', { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
-                const tbody = document.getElementById('tablaMovimientosBody');
-                tbody.innerHTML = '';
+                // Ahora usamos la variable tablaBody definida arriba
+                tablaBody.innerHTML = '';
                 if (data.success && data.data.length > 0) {
                     data.data.forEach(m => {
                         let descripcion = '';
@@ -38,20 +40,34 @@ document.addEventListener('DOMContentLoaded', function() {
                         } else {
                             descripcion = `<strong class="${color}">ENTRADA</strong> de <strong>${m.cantidad} ${m.unidad_medida}</strong> de <strong>${m.nombre_producto}</strong> al inventario general.`;
                         }
+                        
+                        // Añadimos una descripción si es una corrección
+                        if (m.es_correccion == 1) {
+                            descripcion += ` <span class="text-yellow-600 font-bold">(CORRECCIÓN)</span>`;
+                        }
+                        if (m.descripcion_original) {
+                             descripcion += ` <span class="text-gray-500 italic"> - "${m.descripcion_original}"</span>`;
+                        }
 
                         const fecha = new Date(m.fecha_movimiento);
                         const fechaFormateada = fecha.toLocaleDateString('es-EC', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' + fecha.toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit' });
 
-                        tbody.innerHTML += `
+                        // CORRECCIÓN 2: Añadir la celda de "Acciones" (<td>) con el botón.
+                        const accionesHtml = m.es_correccion == 0
+                            ? `<button class="btn-corregir bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 text-sm" data-id="${m.id_movimiento}">Corregir</button>`
+                            : '<span class="text-gray-400 text-sm">No aplicable</span>';
+
+                        tablaBody.innerHTML += `
                             <tr class="border-b hover:bg-gray-50">
-                                <td class="py-2 px-4">${descripcion}</td>
-                                <td class="py-2 px-4">${m.nombre_usuario}</td>
-                                <td class="py-2 px-4">${fechaFormateada}</td>
+                                <td class="py-3 px-4">${descripcion}</td>
+                                <td class="py-3 px-4">${m.nombre_usuario}</td>
+                                <td class="py-3 px-4">${fechaFormateada}</td>
+                                <td class="py-3 px-4">${accionesHtml}</td>
                             </tr>
                         `;
                     });
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4">No hay movimientos para mostrar.</td></tr>';
+                    tablaBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No hay movimientos para mostrar.</td></tr>';
                 }
             });
     }
@@ -124,6 +140,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // CORRECCIÓN 3: El evento ahora funciona porque tablaBody está definida.
+    tablaBody.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-corregir')) {
+            const idMovimiento = e.target.dataset.id;
+            if (confirm('¿Estás seguro de que deseas corregir este movimiento?\nSe creará un movimiento inverso para anularlo.')) {
+                const formData = new FormData();
+                formData.append('action', 'corregir');
+                formData.append('id_movimiento', idMovimiento);
+                
+                fetch('../../controller/MovimientoController.php', { method: 'POST', body: formData })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message);
+                        if (data.success) {
+                            cargarSelects(); // Actualizar stock en selects
+                            cargarMovimientos(); // Refrescar la tabla
+                        }
+                    });
+            }
+        }
+    });
+
 
     // --- Carga Inicial ---
     cargarSelects();

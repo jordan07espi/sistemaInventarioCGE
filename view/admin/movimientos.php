@@ -40,7 +40,7 @@ include '../partials/header.php';
                     <th class="py-2 px-4">Descripción del Movimiento</th>
                     <th class="py-2 px-4">Usuario</th>
                     <th class="py-2 px-4">Fecha y Hora</th>
-                </tr>
+                    <th class="py-2 px-4">Acciones</th> </tr>
             </thead>
             <tbody id="tablaMovimientosBody">
                 </tbody>
@@ -60,8 +60,7 @@ include '../partials/header.php';
 
             <div class="mb-4">
                 <label for="id_producto" class="block text-gray-700">Producto</label>
-                <select name="id_producto" id="id_producto" class="w-full border rounded px-3 py-2 mt-1" required>
-                    </select>
+                <select name="id_producto" id="id_producto" class="w-full border rounded px-3 py-2 mt-1" required></select>
             </div>
             <div class="mb-4">
                 <label for="cantidad" class="block text-gray-700">Cantidad</label>
@@ -71,16 +70,15 @@ include '../partials/header.php';
             <div id="camposSalida" class="hidden">
                 <div class="mb-4">
                     <label for="id_espacio" class="block text-gray-700">Espacio de Destino</label>
-                    <select name="id_espacio" id="id_espacio" class="w-full border rounded px-3 py-2 mt-1">
-                        </select>
+                    <select name="id_espacio" id="id_espacio" class="w-full border rounded px-3 py-2 mt-1"></select>
                 </div>
                 <div class="mb-4">
                     <label for="jornada" class="block text-gray-700">Jornada</label>
                     <select name="jornada" id="jornada" class="w-full border rounded px-3 py-2 mt-1">
                         <option value="">Seleccione jornada</option>
-                        <option value="Matutina">Matutina</option>
-                        <option value="Vespertina">Vespertina</option>
-                        <option value="Nocturna">Nocturna</option>
+                        <option value="Matutino">Matutino</option>
+                        <option value="Vespertino">Vespertino</option>
+                        <option value="Nocturno">Nocturno</option>
                     </select>
                 </div>
             </div>
@@ -96,7 +94,6 @@ include '../partials/header.php';
         </form>
     </div>
 </div>
-
 
 <script src="../assets/js/movimientos.js"></script>
 
