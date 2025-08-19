@@ -18,13 +18,36 @@ include '../partials/header.php';
     </div>
     
     <h2 class="text-xl font-bold mt-6 mb-4">Actividad Reciente</h2>
+
+    <div class="flex items-center space-x-4 mb-4 p-4 bg-gray-50 rounded-lg">
+        <div>
+            <label for="fecha_inicio" class="block text-sm font-medium text-gray-700">Desde:</label>
+            <input type="date" id="fecha_inicio" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        </div>
+        <div>
+            <label for="fecha_fin" class="block text-sm font-medium text-gray-700">Hasta:</label>
+            <input type="date" id="fecha_fin" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+        </div>
+        <button id="btnFiltrar" class="self-end bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+            <i class="fas fa-filter mr-2"></i>Filtrar
+        </button>
+    </div>
+
     <div class="overflow-x-auto">
-        <!-- Aquí irá la tabla de movimientos del día, que construiremos más adelante -->
-        <p>Próximamente: listado de movimientos...</p>
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-200 text-left">
+                    <th class="py-2 px-4">Descripción del Movimiento</th>
+                    <th class="py-2 px-4">Usuario</th>
+                    <th class="py-2 px-4">Fecha y Hora</th>
+                </tr>
+            </thead>
+            <tbody id="tablaMovimientosBody">
+                </tbody>
+        </table>
     </div>
 </div>
 
-<!-- Modal para Registrar Movimiento -->
 <div id="movimientoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
         <div class="flex justify-between items-center mb-4">
@@ -34,47 +57,46 @@ include '../partials/header.php';
         <form id="movimientoForm">
             <input type="hidden" name="action" value="registrar">
             <input type="hidden" name="tipo_movimiento" id="tipo_movimiento">
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="id_producto" class="block text-gray-700">Producto</label>
-                    <select name="id_producto" id="id_producto" class="w-full border rounded px-3 py-2 mt-1" required></select>
-                </div>
-                <div>
-                    <label for="cantidad" class="block text-gray-700">Cantidad</label>
-                    <input type="number" name="cantidad" id="cantidad" class="w-full border rounded px-3 py-2 mt-1" required step="0.01" min="0.01">
-                </div>
+
+            <div class="mb-4">
+                <label for="id_producto" class="block text-gray-700">Producto</label>
+                <select name="id_producto" id="id_producto" class="w-full border rounded px-3 py-2 mt-1" required>
+                    </select>
+            </div>
+            <div class="mb-4">
+                <label for="cantidad" class="block text-gray-700">Cantidad</label>
+                <input type="number" name="cantidad" id="cantidad" class="w-full border rounded px-3 py-2 mt-1" required step="0.01" min="0.01">
             </div>
 
-            <!-- Campos que solo aparecen en la SALIDA -->
-            <div id="camposSalida" class="hidden mt-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="id_espacio" class="block text-gray-700">Espacio de Destino</label>
-                        <select name="id_espacio" id="id_espacio" class="w-full border rounded px-3 py-2 mt-1"></select>
-                    </div>
-                    <div>
-                        <label for="jornada" class="block text-gray-700">Jornada</label>
-                        <select name="jornada" id="jornada" class="w-full border rounded px-3 py-2 mt-1">
-                            <option value="Matutino">Matutino</option>
-                            <option value="Vespertino">Vespertino</option>
-                            <option value="Nocturno">Nocturno</option>
+            <div id="camposSalida" class="hidden">
+                <div class="mb-4">
+                    <label for="id_espacio" class="block text-gray-700">Espacio de Destino</label>
+                    <select name="id_espacio" id="id_espacio" class="w-full border rounded px-3 py-2 mt-1">
                         </select>
-                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="jornada" class="block text-gray-700">Jornada</label>
+                    <select name="jornada" id="jornada" class="w-full border rounded px-3 py-2 mt-1">
+                        <option value="">Seleccione jornada</option>
+                        <option value="Matutina">Matutina</option>
+                        <option value="Vespertina">Vespertina</option>
+                        <option value="Nocturna">Nocturna</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="mt-4">
+            <div class="mb-4">
                 <label for="descripcion" class="block text-gray-700">Descripción (Opcional)</label>
                 <textarea name="descripcion" id="descripcion" class="w-full border rounded px-3 py-2 mt-1" rows="2"></textarea>
             </div>
 
             <div class="flex justify-end mt-6">
-                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Guardar Movimiento</button>
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Registrar Movimiento</button>
             </div>
         </form>
     </div>
 </div>
+
 
 <script src="../assets/js/movimientos.js"></script>
 

@@ -52,5 +52,50 @@ class MovimientoDAO {
             return false;
         }
     }
+
+    public function listarRecientes($fechaInicio = null, $fechaFin = null) {
+        // Consulta base que une todas las tablas para obtener la información completa
+        $sql = "SELECT 
+                    m.tipo_movimiento,
+                    m.cantidad,
+                    m.jornada,
+                    m.fecha_movimiento,
+                    p.nombre_producto,
+                    p.unidad_medida,
+                    e.nombre_espacio,
+                    u.nombre_completo AS nombre_usuario
+                FROM 
+                    movimientos m
+                JOIN 
+                    productos p ON m.id_producto = p.id_producto
+                JOIN 
+                    usuarios u ON m.id_usuario = u.id_usuario
+                LEFT JOIN 
+                    espacios e ON m.id_espacio = e.id_espacio";
+
+        // Lógica para el filtro de fechas
+        if ($fechaInicio && $fechaFin) {
+            // Añadimos +1 día a la fecha fin para incluir todo el día
+            $sql .= " WHERE m.fecha_movimiento BETWEEN :fecha_inicio AND DATE_ADD(:fecha_fin, INTERVAL 1 DAY)";
+        } else {
+            // Por defecto, mostramos los últimos 4 días
+            $sql .= " WHERE m.fecha_movimiento >= NOW() - INTERVAL 4 DAY";
+        }
+        
+        $sql .= " ORDER BY m.fecha_movimiento DESC"; // Ordenamos por los más recientes primero
+
+        try {
+            $stmt = $this->conexion->prepare($sql);
+            if ($fechaInicio && $fechaFin) {
+                $stmt->bindValue(':fecha_inicio', $fechaInicio);
+                $stmt->bindValue(':fecha_fin', $fechaFin);
+            }
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en MovimientoDAO::listarRecientes: " . $e->getMessage());
+            return []; // Devolvemos un array vacío en caso de error
+        }
+    }
 }
 ?>
