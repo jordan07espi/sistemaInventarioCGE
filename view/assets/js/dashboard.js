@@ -31,6 +31,31 @@ window.actualizarDashboard = function(data) {
     } else {
         inventarioBody.innerHTML = '<tr><td colspan="3" class="text-center py-4">No hay productos para mostrar.</td></tr>';
     }
+
+    // Actualizar tabla de actividad reciente
+    const actividadBody = document.getElementById('actividad-reciente-body');
+    actividadBody.innerHTML = '';
+    if (data.movimientosHoy && data.movimientosHoy.length > 0) {
+        data.movimientosHoy.forEach(m => {
+            let descripcion = '';
+            let color = m.tipo_movimiento === 'Entrada' ? 'text-green-600' : 'text-red-600';
+            
+            if (m.tipo_movimiento === 'Salida') {
+                descripcion = `<strong class="${color}">SALIDA</strong> de <strong>${m.cantidad} ${m.unidad_medida}</strong> de <strong>${m.nombre_producto}</strong>.`;
+            } else {
+                descripcion = `<strong class="${color}">ENTRADA</strong> de <strong>${m.cantidad} ${m.unidad_medida}</strong> de <strong>${m.nombre_producto}</strong>.`;
+            }
+
+            actividadBody.innerHTML += `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-2 px-4">${descripcion}</td>
+                    <td class="py-2 px-4 text-gray-700">${m.nombre_usuario}</td>
+                </tr>
+            `;
+        });
+    } else {
+        actividadBody.innerHTML = '<tr><td colspan="2" class="text-center py-4">No hay movimientos registrados hoy.</td></tr>';
+    }
 };
 
 // El listener DOMContentLoaded ya no es necesario aquí para definir la función,

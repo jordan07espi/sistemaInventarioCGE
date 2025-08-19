@@ -56,7 +56,18 @@ include '../partials/header.php';
     
     <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-bold mb-4">Actividad Reciente del Día</h2>
-        <p class="text-gray-600">Próximamente: Tabla de actividad con filtros y paginación...</p>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="text-left text-sm text-gray-600">
+                        <th class="py-2 px-4">Descripción</th>
+                        <th class="py-2 px-4">Usuario</th>
+                    </tr>
+                </thead>
+                <tbody id="actividad-reciente-body">
+                    </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

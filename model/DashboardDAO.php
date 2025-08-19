@@ -70,5 +70,24 @@ class DashboardDAO {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Obtiene los últimos 5 movimientos realizados hoy.
+     */
+    public function getMovimientosHoy() {
+        $sql = "SELECT 
+                    m.tipo_movimiento, m.cantidad,
+                    p.nombre_producto, p.unidad_medida,
+                    u.nombre_completo AS nombre_usuario
+                FROM movimientos m
+                JOIN productos p ON m.id_producto = p.id_producto
+                JOIN usuarios u ON m.id_usuario = u.id_usuario
+                WHERE DATE(m.fecha_movimiento) = CURDATE()
+                ORDER BY m.fecha_movimiento DESC
+                LIMIT 5";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

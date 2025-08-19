@@ -20,13 +20,15 @@ if ($action === 'cargarDatos') {
         $datosResumen = $dashboardDAO->getDatosResumen();
         $productosBajoStock = $dashboardDAO->getProductosConBajoStock();
         $inventarioActual = $dashboardDAO->getInventarioActual();
+        $movimientosHoy = $dashboardDAO->getMovimientosHoy(); // <-- AÑADIR ESTA LÍNEA
 
         if ($datosResumen !== null) {
             $response['success'] = true;
             $response['data'] = [
                 'resumen' => $datosResumen,
                 'productosBajoStock' => $productosBajoStock,
-                'inventarioActual' => $inventarioActual
+                'inventarioActual' => $inventarioActual,
+                'movimientosHoy' => $movimientosHoy // <-- AÑADIR ESTA LÍNEA
             ];
         } else {
             $response['message'] = 'No se pudieron cargar los datos del dashboard.';
