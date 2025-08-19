@@ -35,12 +35,18 @@ $rolUsuario = $_SESSION['rol'] ?? 'Invitado';
 
             <!-- Menú de Navegación -->
             <nav class="hidden md:flex space-x-4">
-                <a href="dashboard.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Dashboard</a>
-                <a href="productos.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Productos</a>
-                <a href="espacios.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Espacios</a>
-                <a href="#" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Reportes</a>
+                <?php if ($rolUsuario === 'Administrador' || $rolUsuario === 'Supervisor') : ?>
+                    <a href="dashboard.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Dashboard</a>
+                    <a href="productos.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Productos</a>
+                    <a href="espacios.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Espacios</a>
+                <?php endif; ?>
+
+                <?php if ($rolUsuario === 'Administrador' || $rolUsuario === 'Supervisor' || $rolUsuario === 'CEO') : ?>
+                    <a href="#" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Reportes</a>
+                <?php endif; ?>
+
                 <?php if ($rolUsuario === 'Administrador') : ?>
-                    <a href="#" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Usuarios</a>
+                    <a href="usuarios.php" class="px-3 py-2 rounded hover:bg-gray-700 transition duration-300">Usuarios</a>
                 <?php endif; ?>
             </nav>
 
