@@ -50,9 +50,25 @@ $rolUsuario = $_SESSION['rol'] ?? 'Invitado';
                 <?php endif; ?>
             </nav>
 
-            <!-- Info de Usuario y Logout -->
-            <div class="flex items-center">
-                <span class="mr-4">Hola, <?php echo htmlspecialchars($nombreUsuario); ?></span>
+            <div class="flex items-center space-x-4">
+                <span class="hidden sm:inline">Hola, <?php echo htmlspecialchars($nombreUsuario); ?></span>
+
+                <div class="relative" id="alertas-container">
+                    <button id="btnAlertas" class="text-white hover:text-gray-300">
+                        <i class="fas fa-bell fa-lg"></i>
+                        <span id="alerta-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">
+                            0
+                        </span>
+                    </button>
+                    <div id="alertas-dropdown" class="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg z-20 hidden">
+                        <div class="p-2 border-b">
+                            <h4 class="font-bold text-gray-800">Alertas de Stock Bajo</h4>
+                        </div>
+                        <ul id="lista-alertas" class="max-h-64 overflow-y-auto">
+                            </ul>
+                    </div>
+                </div>
+
                 <a href="../../controller/logout.php" class="bg-red-600 px-3 py-2 rounded hover:bg-red-700 transition duration-300" title="Cerrar Sesión">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
