@@ -46,6 +46,7 @@ include '../partials/header.php';
                 </tbody>
         </table>
     </div>
+    <div id="paginacion-container" class="flex justify-center items-center mt-6 space-x-1"> </div>
 </div>
 
 <div id="movimientoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">

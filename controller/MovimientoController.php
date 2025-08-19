@@ -44,9 +44,19 @@ switch ($action) {
     case 'listarRecientes':
         $fechaInicio = $_POST['fecha_inicio'] ?? null;
         $fechaFin = $_POST['fecha_fin'] ?? null;
+        $pagina = filter_input(INPUT_POST, 'pagina', FILTER_VALIDATE_INT) ?: 1; 
+        $registrosPorPagina = 20; // Definido aquí
+
+        $resultado = $movimientoDAO->listarRecientes($fechaInicio, $fechaFin, $pagina, $registrosPorPagina);
         
         $response['success'] = true;
-        $response['data'] = $movimientoDAO->listarRecientes($fechaInicio, $fechaFin);
+        $response['data'] = $resultado['data'];
+        $response['pagination'] = [
+            'total_registros' => (int) $resultado['total'],
+            'pagina_actual' => $pagina,
+            'registros_por_pagina' => $registrosPorPagina,
+            'total_paginas' => ceil($resultado['total'] / $registrosPorPagina)
+        ];
         break;
 
     // --- NUEVO: Caso para corregir un movimiento ---
