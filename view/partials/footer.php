@@ -4,7 +4,7 @@
     </main> 
 
     <footer class="text-center mt-auto mb-4 border-t pt-4 text-gray-600 text-sm">
-        <p>&copy; <?php echo date('Y'); ?> Sistema de Inventario <strong>CelestiumSoft</strong> | CGE. Todos los derechos reservados.</p>
+        <p>&copy; <?php echo date('Y'); ?> Sistema de Inventario Desarrollado por<strong>CelestiumSoft</strong> | CGE. Todos los derechos reservados.</p>
     </footer>
 
     <script src="../assets/js/main.js"></script>

@@ -76,20 +76,25 @@ document.addEventListener('DOMContentLoaded', function() {
         let html = '';
         let espacioActual = '';
         datos.forEach(item => {
-            if (item.nombre_espacio !== espacioActual) {
+            const nombreCompletoEspacio = `${item.nombre_espacio} - ${item.piso}`;
+            if (nombreCompletoEspacio !== espacioActual) {
                 if (espacioActual !== '') {
                     html += '</ul></div>'; // Cierra el div y ul anterior
                 }
-                espacioActual = item.nombre_espacio;
+                espacioActual = nombreCompletoEspacio;
                 html += `
                     <div class="mb-4">
-                        <h4 class="font-bold text-indigo-700">${item.nombre_espacio} - ${item.piso}</h4>
+                        <h4 class="font-bold text-indigo-700">${espacioActual}</h4>
                         <ul class="space-y-1 mt-1 pl-2 border-l-2 border-gray-200">
                 `;
             }
+
+            // Si la jornada existe, la mostramos. Si es nula o vacía, mostramos 'No especificada'.
+            const jornadaTexto = item.jornada ? item.jornada : 'No especificada';
+
             html += `
                 <li class="flex justify-between items-center text-sm">
-                    <span>${item.nombre_producto} (${item.unidad_medida})</span>
+                    <span>${item.nombre_producto} (${item.unidad_medida}) - <em class="text-gray-500">${jornadaTexto}</em></span>
                     <span class="font-semibold">${parseFloat(item.total_consumido)}</span>
                 </li>
             `;
