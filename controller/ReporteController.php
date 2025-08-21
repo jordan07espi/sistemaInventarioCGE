@@ -12,6 +12,8 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
         die('Acceso denegado. Por favor, inicie sesión.');
     }
 
+    // Obtenemos el nombre del usuario de la sesión para el reporte
+    $nombreUsuarioReporte = $_SESSION['nombre_completo'] ?? 'Usuario Desconocido';
     $rango = $_GET['rango'] ?? 'hoy';
     date_default_timezone_set('America/Guayaquil');
     
@@ -38,25 +40,19 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
 
     // --- LÓGICA PARA EXCEL (CSV) ---
     if ($exportAction === 'exportarExcel') {
+        // (La lógica de Excel no cambia)
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename=Reporte_Consumo_' . $periodoFile . '.csv');
         $output = fopen('php://output', 'w');
-        
-        fputcsv($output, ['JoseSoft - Reporte de Consumo - ' . $periodoStr]);
+        fputcsv($output, ['CGE - Reporte de Consumo - ' . $periodoStr]);
         fputcsv($output, []); 
         fputcsv($output, ['Consumo General por Implemento']);
         fputcsv($output, ['Producto', 'Unidad', 'Total Consumido']);
-        foreach ($consumoGeneral as $fila) {
-            fputcsv($output, $fila);
-        }
-
+        foreach ($consumoGeneral as $fila) { fputcsv($output, $fila); }
         fputcsv($output, []);
         fputcsv($output, ['Consumo Detallado por Espacio y Jornada']);
         fputcsv($output, ['Espacio', 'Piso', 'Producto', 'Unidad', 'Jornada', 'Total Consumido']);
-        foreach ($consumoDetallado as $fila) {
-            fputcsv($output, $fila);
-        }
-        
+        foreach ($consumoDetallado as $fila) { fputcsv($output, $fila); }
         fclose($output);
         exit();
     }
@@ -66,30 +62,45 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
 
         class PDF extends FPDF {
             private $periodo;
+            private $nombreUsuario; // Propiedad para guardar el nombre del usuario
 
             function setPeriodo($periodo) {
                 $this->periodo = $periodo;
             }
-
-            function Header() {
-                $this->SetFont('Arial','B',14);
-                $this->Cell(0,10, iconv('UTF-8', 'windows-1252', 'JoseSoft - Reporte de Consumo'), 0, 1, 'C');
-                $this->SetFont('Arial','',10);
-                $this->Cell(0, 7, iconv('UTF-8', 'windows-1252', 'Período: ') . $this->periodo, 0, 1, 'C');
-                $this->Ln(5);
+            
+            // Nueva función para pasar el nombre del usuario a la clase
+            function setNombreUsuario($nombre) {
+                $this->nombreUsuario = $nombre;
             }
 
-            // --- FOOTER CORREGIDO Y FINAL ---
+            function Header() {
+                // 1. Logo de la empresa
+                $this->Image('../view/assets/img/logo.png', 10, 8, 25);
+                
+                // 2. Título principal
+                $this->SetFont('Arial','B',14);
+                $this->Cell(0, 7, iconv('UTF-8', 'windows-1252', 'CGE - Reporte de Consumo'), 0, 1, 'C');
+                
+                // 3. Período del reporte
+                $this->SetFont('Arial','',10);
+                $this->Cell(0, 7, iconv('UTF-8', 'windows-1252', 'Período: ') . $this->periodo, 0, 1, 'C');
+                
+                // 4. Usuario que generó el reporte
+                $this->SetFont('Arial','I',9);
+                $this->Cell(0, 7, iconv('UTF-8', 'windows-1252', 'Reporte generado por: ') . iconv('UTF-8', 'windows-1252', $this->nombreUsuario), 0, 1, 'C');
+
+                // 5. Salto de línea para separar la cabecera del contenido
+                $this->Ln(10);
+            }
+
             function Footer() {
                 $this->SetY(-15);
                 $this->SetFont('Arial','',8);
                 
-                // 1. Definir los textos
                 $texto1 = iconv('UTF-8', 'windows-1252', 'Sistema de Inventario Desarrollado por ');
                 $texto_bold = 'CelestiumSoft';
                 $texto2 = iconv('UTF-8', 'windows-1252', ' | CGE. Todos los derechos reservados.');
 
-                // 2. Calcular el ancho total del texto
                 $ancho_texto1 = $this->GetStringWidth($texto1);
                 $this->SetFont('Arial','B',8);
                 $ancho_bold = $this->GetStringWidth($texto_bold);
@@ -97,11 +108,9 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
                 $ancho_texto2 = $this->GetStringWidth($texto2);
                 $ancho_total = $ancho_texto1 + $ancho_bold + $ancho_texto2;
 
-                // 3. Calcular la posición inicial para centrar
                 $posicion_inicial = ($this->GetPageWidth() - $ancho_total) / 2;
                 $this->SetX($posicion_inicial);
 
-                // 4. Escribir el texto en secuencia
                 $this->Cell($ancho_texto1, 10, $texto1, 0, 0, 'L');
                 $this->SetFont('Arial','B',8);
                 $this->Cell($ancho_bold, 10, $texto_bold, 0, 0, 'L');
@@ -112,8 +121,10 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
 
         $pdf = new PDF();
         $pdf->setPeriodo($periodoStr);
+        $pdf->setNombreUsuario($nombreUsuarioReporte); // Pasamos el nombre del usuario
         $pdf->AddPage();
         
+        // El resto del código para generar las tablas se mantiene igual...
         $pdf->SetFont('Arial','B',12);
         $pdf->Cell(0, 10, iconv('UTF-8', 'windows-1252', 'Consumo General por Implemento'), 0, 1);
         $pdf->SetFont('Arial','B',10);

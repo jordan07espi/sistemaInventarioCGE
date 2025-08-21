@@ -74,6 +74,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+
+    // --- LÓGICA PARA EL MENÚ MÓVIL ---
+    const btnMenuMovil = document.getElementById('btnMenuMovil');
+    const menuMovil = document.getElementById('menuMovil');
+
+    if (btnMenuMovil) {
+        btnMenuMovil.addEventListener('click', () => {
+            menuMovil.classList.toggle('hidden');
+        });
+    }
+
     // Carga inicial
     cargarDatosGlobales();
 });
