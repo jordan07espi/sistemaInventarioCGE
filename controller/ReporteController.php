@@ -12,7 +12,6 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
         die('Acceso denegado. Por favor, inicie sesión.');
     }
 
-    // Obtenemos el nombre del usuario de la sesión para el reporte
     $nombreUsuarioReporte = $_SESSION['nombre_completo'] ?? 'Usuario Desconocido';
     $rango = $_GET['rango'] ?? 'hoy';
     date_default_timezone_set('America/Guayaquil');
@@ -40,7 +39,6 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
 
     // --- LÓGICA PARA EXCEL (CSV) ---
     if ($exportAction === 'exportarExcel') {
-        // (La lógica de Excel no cambia)
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename=Reporte_Consumo_' . $periodoFile . '.csv');
         $output = fopen('php://output', 'w');
@@ -62,97 +60,145 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
 
         class PDF extends FPDF {
             private $periodo;
-            private $nombreUsuario; // Propiedad para guardar el nombre del usuario
+            private $nombreUsuario;
+            var $widths;
+            var $aligns;
 
-            function setPeriodo($periodo) {
-                $this->periodo = $periodo;
-            }
-            
-            // Nueva función para pasar el nombre del usuario a la clase
-            function setNombreUsuario($nombre) {
-                $this->nombreUsuario = $nombre;
-            }
+            function setPeriodo($periodo) { $this->periodo = $periodo; }
+            function setNombreUsuario($nombre) { $this->nombreUsuario = $nombre; }
 
             function Header() {
-                // 1. Logo de la empresa
                 $this->Image('../view/assets/img/logo.png', 10, 8, 25);
-                
-                // 2. Título principal
                 $this->SetFont('Arial','B',14);
                 $this->Cell(0, 7, iconv('UTF-8', 'windows-1252', 'CGE - Reporte de Consumo'), 0, 1, 'C');
-                
-                // 3. Período del reporte
                 $this->SetFont('Arial','',10);
                 $this->Cell(0, 7, iconv('UTF-8', 'windows-1252', 'Período: ') . $this->periodo, 0, 1, 'C');
-                
-                // 4. Usuario que generó el reporte
                 $this->SetFont('Arial','I',9);
                 $this->Cell(0, 7, iconv('UTF-8', 'windows-1252', 'Reporte generado por: ') . iconv('UTF-8', 'windows-1252', $this->nombreUsuario), 0, 1, 'C');
-
-                // 5. Salto de línea para separar la cabecera del contenido
                 $this->Ln(10);
             }
 
             function Footer() {
                 $this->SetY(-15);
                 $this->SetFont('Arial','',8);
-                
                 $texto1 = iconv('UTF-8', 'windows-1252', 'Sistema de Inventario Desarrollado por ');
                 $texto_bold = 'CelestiumSoft';
                 $texto2 = iconv('UTF-8', 'windows-1252', ' | CGE. Todos los derechos reservados.');
-
                 $ancho_texto1 = $this->GetStringWidth($texto1);
                 $this->SetFont('Arial','B',8);
                 $ancho_bold = $this->GetStringWidth($texto_bold);
                 $this->SetFont('Arial','',8);
                 $ancho_texto2 = $this->GetStringWidth($texto2);
                 $ancho_total = $ancho_texto1 + $ancho_bold + $ancho_texto2;
-
                 $posicion_inicial = ($this->GetPageWidth() - $ancho_total) / 2;
                 $this->SetX($posicion_inicial);
-
                 $this->Cell($ancho_texto1, 10, $texto1, 0, 0, 'L');
                 $this->SetFont('Arial','B',8);
                 $this->Cell($ancho_bold, 10, $texto_bold, 0, 0, 'L');
                 $this->SetFont('Arial','',8);
                 $this->Cell($ancho_texto2, 10, $texto2, 0, 0, 'L');
             }
-        }
+
+            // --- NUEVAS FUNCIONES PARA TABLAS CON MULTICELDAS ---
+            function SetWidths($w) { $this->widths = $w; }
+            function SetAligns($a) { $this->aligns = $a; }
+
+            function Row($data) {
+                $nb = 0;
+                for($i=0; $i<count($data); $i++)
+                    $nb = max($nb, $this->NbLines($this->widths[$i], $data[$i]));
+                $h = 5 * $nb;
+                $this->CheckPageBreak($h);
+                for($i=0; $i<count($data); $i++) {
+                    $w = $this->widths[$i];
+                    $a = isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
+                    $x = $this->GetX();
+                    $y = $this->GetY();
+                    $this->Rect($x, $y, $w, $h);
+                    $this->MultiCell($w, 5, $data[$i], 0, $a);
+                    $this->SetXY($x + $w, $y);
+                }
+                $this->Ln($h);
+            }
+
+            function CheckPageBreak($h) {
+                if($this->GetY() + $h > $this->PageBreakTrigger)
+                    $this->AddPage($this->CurOrientation);
+            }
+
+            function NbLines($w, $txt) {
+                $cw = &$this->CurrentFont['cw'];
+                if($w==0) $w = $this->w-$this->rMargin-$this->x;
+                $wmax = ($w-2*$this->cMargin)*1000/$this->FontSize;
+                $s = str_replace("\r", '', $txt);
+                $nb = strlen($s);
+                if($nb>0 && $s[$nb-1]=="\n") $nb--;
+                $sep = -1; $i = 0; $j = 0; $l = 0; $nl = 1;
+                while($i<$nb) {
+                    $c = $s[$i];
+                    if($c=="\n") {
+                        $i++; $sep = -1; $j = $i; $l = 0; $nl++;
+                        continue;
+                    }
+                    if($c==' ') $sep = $i;
+                    $l += $cw[$c];
+                    if($l>$wmax) {
+                        if($sep==-1) {
+                            if($i==$j) $i++;
+                        } else
+                            $i = $sep+1;
+                        $sep = -1; $j = $i; $l = 0; $nl++;
+                    } else
+                        $i++;
+                }
+                return $nl;
+            }
+        } // Fin de la clase PDF
 
         $pdf = new PDF();
         $pdf->setPeriodo($periodoStr);
-        $pdf->setNombreUsuario($nombreUsuarioReporte); // Pasamos el nombre del usuario
+        $pdf->setNombreUsuario($nombreUsuarioReporte);
         $pdf->AddPage();
         
-        // El resto del código para generar las tablas se mantiene igual...
+        // --- Tabla de Consumo General (MODIFICADA) ---
         $pdf->SetFont('Arial','B',12);
         $pdf->Cell(0, 10, iconv('UTF-8', 'windows-1252', 'Consumo General por Implemento'), 0, 1);
         $pdf->SetFont('Arial','B',10);
-        $pdf->Cell(90, 7, 'Producto', 1, 0, 'C');
-        $pdf->Cell(40, 7, 'Unidad', 1, 0, 'C');
-        $pdf->Cell(40, 7, 'Total Consumido', 1, 1, 'C');
+        // Ancho total: 90 + 50 + 40 = 180
+        $pdf->SetWidths([90, 50, 40]);
+        $pdf->SetAligns(['C', 'C', 'C']);
+        $pdf->Row(['Producto', 'Unidad', 'Total Consumido']);
+        
         $pdf->SetFont('Arial','',10);
+        $pdf->SetAligns(['L', 'L', 'R']);
         foreach ($consumoGeneral as $fila) {
-            $pdf->Cell(90, 7, iconv('UTF-8', 'windows-1252', $fila['nombre_producto']), 1);
-            $pdf->Cell(40, 7, iconv('UTF-8', 'windows-1252', $fila['unidad_medida']), 1);
-            $pdf->Cell(40, 7, $fila['total_consumido'], 1, 1, 'R');
+            $pdf->Row([
+                iconv('UTF-8', 'windows-1252', $fila['nombre_producto']),
+                iconv('UTF-8', 'windows-1252', $fila['unidad_medida']),
+                $fila['total_consumido']
+            ]);
         }
 
         $pdf->Ln(10);
 
+        // --- Tabla de Consumo Detallado (MODIFICADA) ---
         $pdf->SetFont('Arial','B',12);
         $pdf->Cell(0, 10, iconv('UTF-8', 'windows-1252', 'Consumo Detallado por Espacio y Jornada'), 0, 1);
         $pdf->SetFont('Arial','B',10);
-        $pdf->Cell(60, 7, 'Espacio', 1, 0, 'C');
-        $pdf->Cell(60, 7, 'Producto', 1, 0, 'C');
-        $pdf->Cell(30, 7, 'Jornada', 1, 0, 'C');
-        $pdf->Cell(30, 7, 'Consumo', 1, 1, 'C');
+        // Ancho total: 60 + 60 + 30 + 30 = 180
+        $pdf->SetWidths([60, 60, 30, 30]);
+        $pdf->SetAligns(['C', 'C', 'C', 'C']);
+        $pdf->Row(['Espacio', 'Producto', 'Jornada', 'Consumo']);
+        
         $pdf->SetFont('Arial','',9);
+        $pdf->SetAligns(['L', 'L', 'C', 'R']);
         foreach ($consumoDetallado as $fila) {
-             $pdf->Cell(60, 7, iconv('UTF-8', 'windows-1252', $fila['nombre_espacio'] . ' - ' . $fila['piso']), 1);
-             $pdf->Cell(60, 7, iconv('UTF-8', 'windows-1252', $fila['nombre_producto']), 1);
-             $pdf->Cell(30, 7, iconv('UTF-8', 'windows-1252', $fila['jornada'] ?: 'N/A'), 1);
-             $pdf->Cell(30, 7, $fila['total_consumido'], 1, 1, 'R');
+             $pdf->Row([
+                iconv('UTF-8', 'windows-1252', $fila['nombre_espacio'] . ' - ' . $fila['piso']),
+                iconv('UTF-8', 'windows-1252', $fila['nombre_producto']),
+                iconv('UTF-8', 'windows-1252', $fila['jornada'] ?: 'N/A'),
+                $fila['total_consumido']
+             ]);
         }
 
         $pdf->Output('D', 'Reporte_Consumo_' . $periodoFile . '.pdf');
