@@ -54,9 +54,16 @@ if ($action === 'registrarSalida') {
     
     $movimientoDAO = new MovimientoDAO();
     $resultado = $movimientoDAO->agregar($movimiento);
-
-    // Devolvemos el resultado del DAO directamente como JSON
-    echo json_encode($resultado);
+    
+    if ($resultado) {
+        $response['success'] = true;
+        $response['message'] = 'Movimiento registrado exitosamente.';
+    } else {
+        http_response_code(500);
+        $response['message'] = 'Error al registrar el movimiento en la base de datos.';
+    }
+    
+    echo json_encode($response);
     exit();
 }
 
