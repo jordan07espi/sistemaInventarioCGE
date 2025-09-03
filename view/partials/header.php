@@ -46,7 +46,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Invitado';
     <header class="bg-gray-800 text-white shadow-lg">
         <div class="container mx-auto flex items-center justify-between p-4">
             <div class="flex items-center">
-                <h1 class="text-2xl font-bold">JoseSoft</h1>
+                <h1 class="text-2xl font-bold">JoseSoft | Dpto. de Mantenimiento</h1>
             </div>
 
             <nav class="hidden md:flex space-x-4">
