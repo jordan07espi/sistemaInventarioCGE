@@ -1,7 +1,8 @@
 // Archivo: view/assets/js/reportes.js
 document.addEventListener('DOMContentLoaded', function() {
     const btnGenerar = document.getElementById('btnGenerarReporte');
-    const selectRango = document.getElementById('rangoFechas');
+    const fechaInicioInput = document.getElementById('fecha_inicio');
+    const fechaFinInput = document.getElementById('fecha_fin');
     const zonaResultados = document.getElementById('zonaResultados');
     
     const reporteGeneralBody = document.getElementById('reporteGeneralBody');
@@ -13,10 +14,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnExcel = document.getElementById('btnExportarExcel');
 
     btnGenerar.addEventListener('click', function() {
-        const rango = selectRango.value;
+        const fechaInicio = fechaInicioInput.value;
+        const fechaFin = fechaFinInput.value;
+
+        // Validación para asegurar que las fechas han sido seleccionadas
+        if (!fechaInicio || !fechaFin) {
+            alert('Por favor, seleccione una fecha de inicio y una fecha de fin.');
+            return;
+        }
+
+        if (new Date(fechaInicio) > new Date(fechaFin)) {
+            alert('La fecha de inicio no puede ser mayor que la fecha de fin.');
+            return;
+        }
+
         const formData = new FormData();
         formData.append('action', 'generarReporte');
-        formData.append('rango', rango);
+        formData.append('fecha_inicio', fechaInicio);
+        formData.append('fecha_fin', fechaFin);
 
         reporteGeneralBody.innerHTML = '<p class="text-gray-500">Generando reporte...</p>';
         reporteDetalladoBody.innerHTML = '<p class="text-gray-500">Generando reporte...</p>';
@@ -34,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 periodoGeneral.textContent = `Periodo: ${data.data.periodo}`;
                 periodoDetallado.textContent = `Periodo: ${data.data.periodo}`;
 
-                const baseUrl = `../../controller/ReporteController.php?rango=${rango}`;
+                const baseUrl = `../../controller/ReporteController.php?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`;
                 btnPdf.href = `${baseUrl}&action=exportarPdf`;
                 btnExcel.href = `${baseUrl}&action=exportarExcel`;
             } else {

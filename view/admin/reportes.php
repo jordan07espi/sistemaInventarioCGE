@@ -8,19 +8,20 @@ include '../partials/header.php';
 <p class="text-gray-600 mb-4">Analiza el consumo por período para planificar compras.</p>
 <hr class="my-4">
 
-<div class="bg-white p-4 rounded-lg shadow-md mb-6 flex items-center space-x-4">
+<div class="bg-white p-4 rounded-lg shadow-md mb-6 flex flex-wrap items-center gap-4">
     <div class="flex-grow">
-        <label for="rangoFechas" class="block text-sm font-medium text-gray-700">Rango de Fechas</label>
-        <select id="rangoFechas" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-            <option value="hoy">Hoy</option>
-            <option value="semana">Esta Semana</option>
-            <option value="mes">Este Mes</option>
-        </select>
+        <label for="fecha_inicio" class="block text-sm font-medium text-gray-700">Fecha de Inicio:</label>
+        <input type="date" id="fecha_inicio" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2">
     </div>
-    <button id="btnGenerarReporte" class="self-end bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">
+    <div class="flex-grow">
+        <label for="fecha_fin" class="block text-sm font-medium text-gray-700">Fecha de Fin:</label>
+        <input type="date" id="fecha_fin" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2">
+    </div>
+    <button id="btnGenerarReporte" class="self-end bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-all duration-300">
         <i class="fas fa-chart-bar mr-2"></i>Generar Reporte
     </button>
 </div>
+
 
 <div id="zonaResultados" class="hidden">
     <div class="flex justify-end space-x-2 mb-4">

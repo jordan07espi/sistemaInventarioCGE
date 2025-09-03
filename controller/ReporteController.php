@@ -4,6 +4,19 @@ session_start();
 require_once '../model/ReporteDAO.php';
 require_once '../lib/fpdf/fpdf.php';
 
+date_default_timezone_set('America/Guayaquil');
+
+function obtenerFechasDesdePeticion() {
+    $fechaInicio = $_REQUEST['fecha_inicio'] ?? date('Y-m-d');
+    $fechaFin = $_REQUEST['fecha_fin'] ?? date('Y-m-d');
+
+    // Aseguramos que la fecha de fin incluya todo el día
+    $fechaFinCompleta = date('Y-m-d 23:59:59', strtotime($fechaFin));
+
+    return [$fechaInicio, $fechaFinCompleta, $fechaFin]; // Devuelve también la fecha fin sin hora para nombres de archivo
+}
+
+
 // --- LÓGICA COMPLETA Y MEJORADA PARA EXPORTACIÓN ---
 $exportAction = $_GET['action'] ?? '';
 if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
@@ -13,29 +26,13 @@ if ($exportAction === 'exportarExcel' || $exportAction === 'exportarPdf') {
     }
 
     $nombreUsuarioReporte = $_SESSION['nombre_completo'] ?? 'Usuario Desconocido';
-    $rango = $_GET['rango'] ?? 'hoy';
-    date_default_timezone_set('America/Guayaquil');
-    
-    switch ($rango) {
-        case 'semana':
-            $fechaInicio = date('Y-m-d 00:00:00', strtotime('monday this week'));
-            $fechaFin = date('Y-m-d 23:59:59', strtotime('sunday this week'));
-            break;
-        case 'mes':
-            $fechaInicio = date('Y-m-01 00:00:00');
-            $fechaFin = date('Y-m-t 23:59:59');
-            break;
-        default: // 'hoy'
-            $fechaInicio = date('Y-m-d 00:00:00');
-            $fechaFin = date('Y-m-d 23:59:59');
-            break;
-    }
+    list($fechaInicio, $fechaFin, $fechaFinSimple) = obtenerFechasDesdePeticion();
 
     $reporteDAO = new ReporteDAO();
     $consumoGeneral = $reporteDAO->getConsumoGeneral($fechaInicio, $fechaFin);
     $consumoDetallado = $reporteDAO->getConsumoPorEspacio($fechaInicio, $fechaFin);
-    $periodoStr = date('d/m/Y', strtotime($fechaInicio)) . ' al ' . date('d/m/Y', strtotime($fechaFin));
-    $periodoFile = date('Ymd', strtotime($fechaInicio)) . '_' . date('Ymd', strtotime($fechaFin));
+    $periodoStr = date('d/m/Y', strtotime($fechaInicio)) . ' al ' . date('d/m/Y', strtotime($fechaFinSimple));
+    $periodoFile = date('Ymd', strtotime($fechaInicio)) . '_' . date('Ymd', strtotime($fechaFinSimple));
 
     // --- LÓGICA PARA EXCEL (CSV) ---
     if ($exportAction === 'exportarExcel') {
@@ -222,22 +219,7 @@ if (!isset($_SESSION['id_usuario'])) {
 $reporteDAO = new ReporteDAO();
 
 if ($action === 'generarReporte') {
-    $rango = $_POST['rango'] ?? 'hoy';
-    date_default_timezone_set('America/Guayaquil');
-    switch ($rango) {
-        case 'semana':
-            $fechaInicio = date('Y-m-d 00:00:00', strtotime('monday this week'));
-            $fechaFin = date('Y-m-d 23:59:59', strtotime('sunday this week'));
-            break;
-        case 'mes':
-            $fechaInicio = date('Y-m-01 00:00:00');
-            $fechaFin = date('Y-m-t 23:59:59');
-            break;
-        default: // 'hoy'
-            $fechaInicio = date('Y-m-d 00:00:00');
-            $fechaFin = date('Y-m-d 23:59:59');
-            break;
-    }
+    list($fechaInicio, $fechaFin, $fechaFinSimple) = obtenerFechasDesdePeticion();
 
     try {
         $consumoGeneral = $reporteDAO->getConsumoGeneral($fechaInicio, $fechaFin);
@@ -247,7 +229,7 @@ if ($action === 'generarReporte') {
         $response['data'] = [
             'general' => $consumoGeneral,
             'detallado' => $consumoDetallado,
-            'periodo' => date('d/m/Y', strtotime($fechaInicio)) . ' - ' . date('d/m/Y', strtotime($fechaFin))
+            'periodo' => date('d/m/Y', strtotime($fechaInicio)) . ' - ' . date('d/m/Y', strtotime($fechaFinSimple))
         ];
     } catch (Exception $e) {
         $response['message'] = 'Error al generar el reporte: ' . $e->getMessage();
