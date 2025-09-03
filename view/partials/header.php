@@ -46,7 +46,7 @@ $rolUsuario = $_SESSION['rol'] ?? 'Invitado';
     <header class="bg-gray-800 text-white shadow-lg">
         <div class="container mx-auto flex items-center justify-between p-4">
             <div class="flex items-center">
-                <h1 class="text-2xl font-bold">JoseSoft | Dpto. de Mantenimiento</h1>
+                <h1 class="text-2xl font-bold">JoseSoft</h1>
             </div>
 
             <nav class="hidden md:flex space-x-4">
@@ -55,8 +55,10 @@ $rolUsuario = $_SESSION['rol'] ?? 'Invitado';
                     <a href="movimientos.php" class="px-3 py-2 rounded hover:bg-gray-700">Movimientos</a>
                     <a href="productos.php" class="px-3 py-2 rounded hover:bg-gray-700">Productos</a>
                     <a href="espacios.php" class="px-3 py-2 rounded hover:bg-gray-700">Espacios</a>
+                    <a href="qr_generator.php" class="px-3 py-2 rounded hover:bg-gray-700">Generar QR</a>
                 <?php endif; ?>
-                <?php if ($rolUsuario !== 'Invitado') : // Muestra reportes a todos menos al rol 'Invitado' ?>
+                <a href="scanner.php" class="px-3 py-2 rounded hover:bg-gray-700">Escáner</a>
+                <?php if ($rolUsuario !== 'Invitado') : ?>
                     <a href="reportes.php" class="px-3 py-2 rounded hover:bg-gray-700">Reportes</a>
                 <?php endif; ?>
                 <?php if ($rolUsuario === 'Administrador') : ?>
@@ -89,16 +91,18 @@ $rolUsuario = $_SESSION['rol'] ?? 'Invitado';
 
         <div id="menuMovil" class="hidden md:hidden bg-gray-700">
             <?php if ($rolUsuario === 'Administrador' || $rolUsuario === 'Supervisor') : ?>
-                <a href="dashboard.php" class="block px-4 py-2 text-white hover:bg-gray-600">Dashboard</a>
-                <a href="movimientos.php" class="block px-4 py-2 text-white hover:bg-gray-600">Movimientos</a>
-                <a href="productos.php" class="block px-4 py-2 text-white hover:bg-gray-600">Productos</a>
-                <a href="espacios.php" class="block px-4 py-2 text-white hover:bg-gray-600">Espacios</a>
+            <a href="dashboard.php" class="block px-4 py-2 text-white hover:bg-gray-600">Dashboard</a>
+            <a href="movimientos.php" class="block px-4 py-2 text-white hover:bg-gray-600">Movimientos</a>
+            <a href="productos.php" class="block px-4 py-2 text-white hover:bg-gray-600">Productos</a>
+            <a href="espacios.php" class="block px-4 py-2 text-white hover:bg-gray-600">Espacios</a>
+            <a href="qr_generator.php" class="block px-4 py-2 text-white hover:bg-gray-600">Generar QR</a>
             <?php endif; ?>
+            <a href="scanner.php" class="block px-4 py-2 text-white hover:bg-gray-600">Escáner</a>
             <?php if ($rolUsuario !== 'Invitado') : ?>
-                <a href="reportes.php" class="block px-4 py-2 text-white hover:bg-gray-600">Reportes</a>
+            <a href="reportes.php" class="block px-4 py-2 text-white hover:bg-gray-600">Reportes</a>
             <?php endif; ?>
             <?php if ($rolUsuario === 'Administrador') : ?>
-                <a href="usuarios.php" class="block px-4 py-2 text-white hover:bg-gray-600">Usuarios</a>
+            <a href="usuarios.php" class="block px-4 py-2 text-white hover:bg-gray-600">Usuarios</a>
             <?php endif; ?>
         </div>
     </header>
