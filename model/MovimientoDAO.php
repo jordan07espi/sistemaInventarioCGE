@@ -90,7 +90,7 @@ class MovimientoDAO {
         }
         if ($fechaFin) {
             // Agrega la condición para la fecha de fin (incluyendo todo el día)
-            $whereConditions[] = "m.fecha_movimiento < DATE_ADD(:fecha_fin, INTERVAL 1 DAY)";
+            $whereConditions[] = "m.fecha_movimiento <= :fecha_fin";
             $params[':fecha_fin'] = $fechaFin;
         }
 

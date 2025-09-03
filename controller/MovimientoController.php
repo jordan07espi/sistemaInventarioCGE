@@ -47,6 +47,11 @@ switch ($action) {
         $pagina = filter_input(INPUT_POST, 'pagina', FILTER_VALIDATE_INT) ?: 1; 
         $registrosPorPagina = 20; // Definido aquí
 
+        // Ajustamos la fecha de fin para que incluya todo el día
+        if ($fechaFin) {
+            $fechaFin = date('Y-m-d 23:59:59', strtotime($fechaFin));
+        }
+
         $resultado = $movimientoDAO->listarRecientes($fechaInicio, $fechaFin, $pagina, $registrosPorPagina);
         
         $response['success'] = true;
